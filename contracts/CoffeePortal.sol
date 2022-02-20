@@ -41,17 +41,23 @@ contract CoffeePortal{
     function buyCoffee(string memory _message, string memory _name, uint256 _payAmount) public payable {
         uint256 cost = 0.001 ether;
         require(
-            _payAmount >= cost,
+            msg.value >= cost,
             "Insuficient amount for a minimum selected."
         );
 
+        require(
+            _payAmount == msg.value,
+            "Distinct amounts were sent."
+        );
+
         totalCoffee +=1;
+        console.log("Payable MSG: %s", msg.value);
 
         console.log("%s just sent a cofee", msg.sender);
 
-        coffee.push(Coffee(msg.sender, _message, _name, _payAmount, block.timestamp));
+        coffee.push(Coffee(msg.sender, _message, _name, msg.value, block.timestamp));
 
-        (bool success, ) = owner.call{value: _payAmount}("");
+        (bool success, ) = owner.call{value: msg.value}("");
         require(
             success,
             "Failed to send amount"

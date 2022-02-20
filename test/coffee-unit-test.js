@@ -38,7 +38,7 @@ describe('CoffeePortal', function () {
         'Rony',
         ethers.utils.parseEther('0.001'),
         {
-          value: hre.ethers.utils.parseEther('0.001'),
+          value: ethers.utils.parseEther('0.001'),
         }
       )
 
@@ -72,7 +72,7 @@ describe('CoffeePortal', function () {
         'Rony',
         ethers.utils.parseEther('0.0001'),
         {
-          value: hre.ethers.utils.parseEther('0.0001'),
+          value: ethers.utils.parseEther('0.0001'),
         }
       )
     ).to.be.revertedWith('Insuficient amount for a minimum selected.')
