@@ -31,7 +31,7 @@ npx hardhat node
 node scripts/sample-script.js
 npx hardhat help
 ```
-Install all project dependencies. 
-Update hardhat config and use it to deploy the contrat using deploy.js
-Update ABI and contract address references to NextJS project. 
-Run NextJS project.
+- Install all project dependencies. 
+- Update hardhat config and use it to deploy the contrat using deploy.js
+- Update ABI and contract address references to NextJS project. 
+- Run NextJS project.
