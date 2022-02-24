@@ -1,30 +1,19 @@
-# Next.js + Tailwind CSS Example using Hardhat for Solidity Smart Contracts
+<p>
+<img alt="Next.js" src="https://img.shields.io/badge/-Next.js-black?style=for-the-badge&logo=next.js&logoColor=white" />
+<img alt="Tailwind.css" src="https://img.shields.io/badge/-Tailwindcss-0B2035?style=for-the-badge&logo=tailwindcss&logoColor=38BDF8" />
+  
+<img alt="Web3.js" src="https://img.shields.io/badge/-Web3.js-F16822?style=for-the-badge&logo=web3.js&logoColor=white" />
+<img alt="HardHat" src="https://img.shields.io/badge/-Hardhat-7C86C7?style=for-the-badge&logo=hardhat&logoColor=white" />
+<img alt="Solidity" src="https://img.shields.io/badge/-Solidity-BAC9F9?style=for-the-badge&logo=solidity&logoColor=363636" />
+<img alt="Ethereum" src="https://img.shields.io/badge/-Ethereum-3C3C3D?style=for-the-badge&logo=ethereum&logoColor=white" />
+</p>
 
-This example shows how to use [Tailwind CSS](https://tailwindcss.com/) [(v3.0)](https://tailwindcss.com/blog/tailwindcss-v3) with Next.js. It follows the steps outlined in the official [Tailwind docs](https://tailwindcss.com/docs/guides/nextjs).
 
-## Preview
+# Next.js - Tailwind CSS Example using Hardhat for Solidity Smart Contracts and Waffle
 
-Preview the example live on [StackBlitz](http://stackblitz.com/):
+This is a simple NextJS project integrated with Solidity smart contract. 
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-tailwindcss)
-
-## Deploy your own
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-tailwindcss&project-name=with-tailwindcss&repository-name=with-tailwindcss)
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
-
-```bash
-npx create-next-app --example with-tailwindcss with-tailwindcss-app
-# or
-yarn create next-app --example with-tailwindcss with-tailwindcss-app
-```
-
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+It is a NextJS - TailwindCss built in with Hardhat and Waffle for smart contract tests. 
 
 
 # It's a Hardhat Project
@@ -42,3 +31,7 @@ npx hardhat node
 node scripts/sample-script.js
 npx hardhat help
 ```
+Install all project dependencies. 
+Update hardhat config and use it to deploy the contrat using deploy.js
+Update ABI and contract address references to NextJS project. 
+Run NextJS project.
