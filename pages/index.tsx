@@ -1,7 +1,56 @@
+import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { ethers } from "ethers";
+import "react-toastify/dist/ReactToastify.css";
 import Head from 'next/head'
+import abi from '../utils/CoffeePortal.json';
+
+declare var window: any
 
 export default function Home() {
+
+  /** 
+   * Contract Holder
+   */
+  const contractAddress = "";
+
+  /**
+   * Contract ABI from Json
+   */
+  const contractABI = abi.abi;
+
+  const [currentAccount, setCurrentAccount] = useState("");
+
+  const [message, setMessage] = useState("");
+
+  const [name, setName] = useState("");
+
+  /**
+   * State to store Coffee
+   */
+  const [allCoffee, setAllCoffee] = useState([]);
+
+  const checkIfWalletIsConnected = async() => {
+
+    try{
+
+      const {ethereum} = window;
+      const accounts = await ethereum.request({method:"eth_accounts"});
+      console.log("Retrieving accounts");
+      console.log(`Accounts ${accounts}`);
+
+    }catch(err){
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+    checkIfWalletIsConnected();
+  });
+  
+  
   return (
+
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <Head>
         <title>Create Next DApp</title>
@@ -12,7 +61,7 @@ export default function Home() {
         <h1 className="text-6xl font-bold">
           Welcome to{' '}
           <a className="text-blue-600" href="https://nextjs.org">
-            Next.js Dapp!
+            Next.js Dapp TESTE!
           </a>
         </h1>
 
