@@ -77,4 +77,25 @@ describe('CoffeePortal', function () {
       )
     ).to.be.revertedWith('Insuficient amount for a minimum selected.')
   })
+
+  it("Shouldn't permit buy a coffee with different payAmount and msgValue", async function () {
+    const CoffeePortal = await ethers.getContractFactory('CoffeePortal')
+    const coffeePortal = await CoffeePortal.deploy({
+      value: ethers.utils.parseEther(defaultETHContract),
+    })
+    await coffeePortal.deployed()
+
+    //ADD NEW COFFEE
+    await expect(
+      coffeePortal.buyCoffee(
+        'This is my first coffee',
+        'Rony',
+        ethers.utils.parseEther('0.001'),
+        {
+          value: ethers.utils.parseEther('0.002'),
+        }
+      )
+    ).to.be.revertedWith('Distinct amounts were sent.')
+  })
+
 })

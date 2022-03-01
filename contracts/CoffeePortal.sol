@@ -53,6 +53,8 @@ contract CoffeePortal{
         totalCoffee +=1;
         console.log("Payable MSG: %s", msg.value);
 
+        console.log("PayAmount value: %d", _payAmount);
+
         console.log("%s just sent a cofee", msg.sender);
 
         coffee.push(Coffee(msg.sender, _message, _name, msg.value, block.timestamp));

@@ -1,131 +1,378 @@
-import React, { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import { ethers } from "ethers";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useEffect, useState } from 'react'
+import { ToastContainer, toast } from 'react-toastify'
+import { ethers } from 'ethers'
+import 'react-toastify/dist/ReactToastify.css'
 import Head from 'next/head'
-import abi from '../utils/CoffeePortal.json';
+import abi from '../utils/CoffeePortal.json'
 
 declare var window: any
+toast.configure()
 
 export default function Home() {
-
-  /** 
+  /**
    * Contract Holder
    */
-  const contractAddress = "";
+  const contractAddress = '0x4Ef5E1A0443C99A3E4856b51d95d52508f3738CE'
 
   /**
    * Contract ABI from Json
    */
-  const contractABI = abi.abi;
+  const contractABI = abi.abi
 
-  const [currentAccount, setCurrentAccount] = useState("");
+  const [currentAccount, setCurrentAccount] = useState('')
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('')
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState('')
 
   /**
    * State to store Coffee
    */
-  const [allCoffee, setAllCoffee] = useState([]);
+  const [allCoffee, setAllCoffee] = useState([])
 
-  const checkIfWalletIsConnected = async() => {
+  const checkIfWalletIsConnected = async () => {
+    try {
+      const { ethereum } = window
+      const accounts = await ethereum.request({ method: 'eth_accounts' })
 
-    try{
+      if (accounts.length !== 0) {
+        const account = accounts[0]
 
-      const {ethereum} = window;
-      const accounts = await ethereum.request({method:"eth_accounts"});
-      console.log("Retrieving accounts");
-      console.log(`Accounts ${accounts}`);
+        setCurrentAccount(account)
+        toast.success(`Wallet is connected ${account} `, {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        })
+      } else {
+        toast.warn('Make sure metamask wallet is connected', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        })
+      }
+    } catch (err) {
+      console.log(err.message)
+      toast.error(`${err.message}`, {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+    }
+  }
 
-    }catch(err){
-      console.log(err);
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window
+      if (!ethereum) {
+        toast.warn('Make sure metamask wallet is connected', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        })
+        return
+      }
+
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+      setCurrentAccount(accounts[0])
+    } catch (err) {
+      console.error('Error: ', err)
+    }
+  }
+
+  /**
+   * Method used to request buyACoffee to the smart contract
+   */
+  const buyACoffee = async () => {
+    try {
+      const { ethereum } = window
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
+        const coffeeContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        )
+
+        let count = await coffeeContract.getTotalCoffee()
+        console.log(`A total of ${count.toNumber()} coffees retrieved..`)
+
+        const coffeeTxn = await coffeeContract.buyCoffee(
+          message ? message : 'Enjoy this good coffee',
+          name ? name : 'Anonymous',
+          ethers.utils.parseEther('0.001'),
+          {
+            value: ethers.utils.parseEther('0.001'),
+            //gasLimit: 300000,
+          }
+        )
+        console.log(`Mining Coffee...${coffeeTxn.hash}`)
+
+        toast.info('Sending Tip for Coffee...', {
+          position: 'top-left',
+          autoClose: 18050,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        })
+
+        await coffeeTxn.wait()
+
+        console.log('Coffee Mined')
+
+        count = await coffeeContract.getTotalCoffee()
+
+        console.log('Retrieved total coffee count...', count.toNumber())
+
+        setMessage('')
+        setName('')
+
+        //Toast Success
+        toast.success('Coffee Purchased successfully!', {
+          position: 'top-left',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        })
+      } else {
+        console.log('Ethereum object does not exist')
+      }
+    } catch (err) {
+      console.log(err.message)
+      toast.error(`${err.message}`, {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+    }
+  }
+  /*
+   * Create a method that gets all coffee from your contract
+   */
+  const getAllCoffee = async () => {
+    try {
+      const { ethereum } = window
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
+        const coffeeContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        )
+
+        /*
+         * Call the getAllCoffee method from your Smart Contract
+         */
+        const coffees = await coffeeContract.getAllCoffee()
+
+        /*
+         * We only need address, timestamp, name, and message in our UI so let's
+         * pick those out
+         */
+        const coffeeCleaned = coffees.map((coffee: any) => {
+          return {
+            address: coffee.giver,
+            timestamp: new Date(coffee.timestamp * 1000),
+            message: coffee.message,
+            name: coffee.name,
+          }
+        })
+
+        /*
+         * Store our data in React State
+         */
+        setAllCoffee(coffeeCleaned)
+      } else {
+        console.log("Ethereum object doesn't exist!")
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 
   useEffect(() => {
-    checkIfWalletIsConnected();
-  });
-  
-  
-  return (
 
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+    let coffeeContract: any;
+    getAllCoffee();
+    checkIfWalletIsConnected();
+
+    const onNewCoffee = (from:any, timestamp:any, message:any, name:any) => {
+      console.log("NewCoffee", from, timestamp, message, name);
+      
+      setAllCoffee((prevState) => [
+        ...prevState,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          message: message,
+          name: name,
+        },
+      ]);
+    };
+
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      coffeeContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      coffeeContract.on("NewCoffee", onNewCoffee);
+    }
+
+    return () => {
+      if (coffeeContract) {
+        coffeeContract.off("NewCoffee", onNewCoffee);
+      }
+    };
+  }, []);
+
+  const handleOnMessageChange = (event:any) => {
+    const { value } = event.target;
+    setMessage(value);
+  };
+  const handleOnNameChange = (event:any) => {
+    const { value } = event.target;
+    setName(value);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
-        <title>Create Next DApp</title>
+        <title>Buy Me a Coffee using Ether</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js Dapp TESTE!
-          </a>
+      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+        <h1 className="text-6xl font-bold text-blue-400 mb-6">
+          Buy Me A Coffee
         </h1>
+        {/*
+         * If there is currentAccount render this form, else render a button to connect wallet
+         */}
 
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="rounded-md bg-gray-100 p-3 font-mono text-lg">
-            pages/index.tsx
-          </code>
-        </p>
+        {currentAccount ? (
+          <div className="w-full max-w-xs sticky top-3 z-50 ">
+            <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="name"
+                >
+                  Name
+                </label>
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="name"
+                  type="text"
+                  placeholder="Name"
+                  onChange={handleOnNameChange}
+                  required
+                />
+              </div>
 
-        <div className="mt-6 flex max-w-4xl flex-wrap items-center justify-around sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
+              <div className="mb-4">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="message"
+                >
+                  Send the Creator a Message
+                </label>
+
+                <textarea
+                  className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  rows="3"
+                  placeholder="Message"
+                  id="message"
+                  onChange={handleOnMessageChange}
+                  required
+                ></textarea>
+              </div>
+
+              <div className="flex items-left justify-between">
+                <button
+                  className="bg-blue-400 hover:bg-blue-400 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  type="button"
+                  onClick={buyACoffee}
+                >
+                  Support $5
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : (
+          <button
+            className="bg-blue-400 hover:bg-blue-400 text-white font-bold py-2 px-3 rounded-full mt-3"
+            onClick={connectWallet}
           >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and API.
-            </p>
-          </a>
+            Connect Your Wallet
+          </button>
+        )}
 
-          <a
-            href="https://nextjs.org/learn"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
+        {allCoffee.map((coffee, index) => {
+          return (
+            <div className="border-l-2 mt-10" key={index}>
+              <div className="transform transition cursor-pointer hover:-translate-y-2 ml-10 relative flex items-center px-6 py-4 bg-blue-400 text-white rounded mb-10 flex-col md:flex-row space-y-4 md:space-y-0">
+                {/* <!-- Dot Following the Left Vertical Line --> */}
+                <div className="w-5 h-5 bg-amber-200 absolute -left-10 transform -translate-x-2/4 rounded-full z-10 mt-2 md:mt-0"></div>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
+                {/* <!-- Line that connecting the box with the vertical line --> */}
+                <div className="w-10 h-1 bg-green-200 absolute -left-10 z-0"></div>
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+                {/* <!-- Content that showing in the box --> */}
+                <div className="flex-auto">
+                  <h1 className="text-md">Supporter: {coffee.name}</h1>
+                  <h1 className="text-md">Message: {coffee.message}</h1>
+                  <h3>Address: {coffee.address}</h3>
+                  <h1 className="text-md font-bold">
+                    TimeStamp: {coffee.timestamp.toString()}
+                  </h1>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </main>
-
-      <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="ml-2 h-4" />
-        </a>
-      </footer>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
-  )
+  );
 }
