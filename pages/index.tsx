@@ -8,6 +8,14 @@ import abi from '../utils/CoffeePortal.json'
 declare var window: any
 toast.configure()
 
+
+interface CoffeeListItem{
+  address: String,
+  timestamp: Date,
+  message: String,
+  name: String
+}
+
 export default function Home() {
   /**
    * Contract Holder
@@ -28,7 +36,8 @@ export default function Home() {
   /**
    * State to store Coffee
    */
-  const [allCoffee, setAllCoffee] = useState([])
+  //const [allCoffee, setAllCoffee] = useState([]);
+  const [allCoffee, setAllCoffee] = useState<CoffeeListItem[] | null>(null);
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -175,6 +184,7 @@ export default function Home() {
   /*
    * Create a method that gets all coffee from your contract
    */
+
   const getAllCoffee = async () => {
     try {
       const { ethereum } = window
@@ -208,6 +218,7 @@ export default function Home() {
         /*
          * Store our data in React State
          */
+        console.log('setting up all coffess');
         setAllCoffee(coffeeCleaned)
       } else {
         console.log("Ethereum object doesn't exist!")
@@ -223,19 +234,24 @@ export default function Home() {
     getAllCoffee();
     checkIfWalletIsConnected();
 
-    const onNewCoffee = (from:any, timestamp:any, message:any, name:any) => {
-      console.log("NewCoffee", from, timestamp, message, name);
+    const onNewCoffee = (coffee:CoffeeListItem): void => {
+      console.log("NewCoffee: ", coffee);
+      getAllCoffee();
+     // setAllCoffee((prevstate) => prevstate ? [...prevstate, coffee]: [coffee])
+    }
+    // const onNewCoffee2 = (from:any, timestamp:any, message:any, name:any) => {
+    //   console.log("NewCoffee", from, timestamp, message, name);
       
-      setAllCoffee((prevState) => [
-        ...prevState,
-        {
-          address: from,
-          timestamp: new Date(timestamp * 1000),
-          message: message,
-          name: name,
-        },
-      ]);
-    };
+    //   setAllCoffee((prevState) => [
+    //     ...prevState,
+    //     {
+    //       address: from,
+    //       timestamp: new Date(timestamp * 1000),
+    //       message: message,
+    //       name: name,
+    //     },
+    //   ]);
+    // };
 
     if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -338,7 +354,7 @@ export default function Home() {
           </button>
         )}
 
-        {allCoffee.map((coffee, index) => {
+        {allCoffee?.map((coffee, index) => {
           return (
             <div className="border-l-2 mt-10" key={index}>
               <div className="transform transition cursor-pointer hover:-translate-y-2 ml-10 relative flex items-center px-6 py-4 bg-blue-400 text-white rounded mb-10 flex-col md:flex-row space-y-4 md:space-y-0">
@@ -354,7 +370,7 @@ export default function Home() {
                   <h1 className="text-md">Message: {coffee.message}</h1>
                   <h3>Address: {coffee.address}</h3>
                   <h1 className="text-md font-bold">
-                    TimeStamp: {coffee.timestamp.toString()}
+                    TimeStamp: {coffee.timestamp?.toString()}
                   </h1>
                 </div>
               </div>
