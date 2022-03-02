@@ -326,7 +326,7 @@ export default function Home() {
 
                 <textarea
                   className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  rows="3"
+                  rows={3}
                   placeholder="Message"
                   id="message"
                   onChange={handleOnMessageChange}
