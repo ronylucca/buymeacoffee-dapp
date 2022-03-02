@@ -15,6 +15,8 @@ This is a simple NextJS project integrated with Solidity smart contract.
 
 It is a NextJS - TailwindCss built in with Hardhat and Waffle for smart contract tests. 
 
+Acess demo [Here](https://buymeacoffee-dapp.vercel.app/)
+
 
 # It's a Hardhat Project
 
